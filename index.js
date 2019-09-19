@@ -15,3 +15,4 @@ const RNRedux = () => (
 )
 
 AppRegistry.registerComponent(appName, () => RNRedux);
+
