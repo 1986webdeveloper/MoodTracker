@@ -7,9 +7,9 @@ export const addMood = mood => {
   }
 }
 
-export const removeMood = index => {
+export const removeMood = key => {
   return {
     type: REMOVE_MOOD,
-    payload: index
+    payload: key
   }
 }

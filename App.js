@@ -3,37 +3,63 @@ import { StyleSheet, View, TextInput, Button, FlatList, Image, TouchableOpacity,
 import { connect } from 'react-redux';
 import { addMood, removeMood } from './actions/mood';
 
+//moode images path store into variable
+import mood_0 from './images/0.png';
+import mood_1 from './images/1.png';
+import mood_2 from './images/2.png';
+import mood_3 from './images/3.png';
+import mood_4 from './images/4.png';
 
 class App extends Component {
 
-  state = {
-    mood: '',
-    moods: [],
-    images: [require('./images/0.png'), require('./images/1.png'), require('./images/2.png'), require('./images/3.png')]
+  //this method used for add mood record into redux.
+  saveMood = (type) => {
+    this.props.addMood(type);
   }
 
-  moodSubmitHandler = (type) => {
-
-    this.props.add(type);
+  //this method used for remove mood record from redux.
+  moodRemoveHandler = (key) => {
+    this.props.removeMood(key);
   }
-  moodRemoveHandler = (index) => {
-
-    this.props.remove(index);
-
-  }
-
-  moodChangeHandler = (value) => {
-    this.setState({
-      mood: value
-    });
-  }
+  //this method used for convert  timestamp to specific date format
   formateDate = (timStamp) => {
     date = "";
     var d = new Date(timStamp);
-    date = d.getDay() + "/" + d.getMonth() + "/" + d.getFullYear() + " " + d.getHours() + ":" + d.getMinutes() + ":" + d.getSeconds();
+    date = this.formatDigit(d.getDay()) + "/" + this.formatDigit(d.getMonth()) + "/" + this.formatDigit(d.getFullYear()) + " " + this.formatDigit(d.getHours()) + ":" + this.formatDigit(d.getMinutes()) + ":" + this.formatDigit(d.getSeconds());
     return date
   }
 
+  //format digit method 
+  formatDigit = (digit)=>{
+    if(digit>9){
+      return digit
+    }else{
+      return '0'+digit
+    }
+  }
+
+  //this method used for get mood image from mood value
+  getMoodTypeImage = (type) => {
+    switch (type) {
+      case 0:
+        return mood_0
+      case 1:
+        return mood_1
+      case 2:
+        return mood_2
+      case 3:
+        return mood_3
+      case 4:
+        return mood_4
+
+      default:
+        return mood_0
+        break;
+
+    }
+  }
+
+  //this method used for display list of mood from redux
   moodDisplay = () => {
     return (
       <FlatList contentContainerStyle={{ paddingBottom: '15%' }} style={styles.listContainer}
@@ -41,11 +67,11 @@ class App extends Component {
         keyExtractor={(item, index) => index.toString()}
         renderItem={({ item, index }) => (
           <View style={styles.listItem}>
-            <Image style={styles.imagesItem} source={this.state.images[item.value]} />
+            <Image style={styles.imagesItem} source={this.getMoodTypeImage(item.value)} />
 
             <Text style={{ alignSelf: 'center' }}>{this.formateDate(item.date)}</Text>
             <View style={{ width: 30, height: 30, position: 'absolute', end: 10, alignSelf: 'center' }}>
-              <TouchableOpacity onPress={() => this.moodRemoveHandler(index)}>
+              <TouchableOpacity onPress={() => this.moodRemoveHandler(item.key)}>
                 <Image style={{ height: 30, width: 30 }} source={require('./images/delete.png')} />
               </TouchableOpacity>
             </View >
@@ -54,13 +80,14 @@ class App extends Component {
       />
     )
   }
-  saveMood = (type) => {
-    this.moodSubmitHandler(type);
-  }
 
   render() {
     return (
       <View style={styles.container}>
+
+        <View style={{ flex: 1 }}>
+          {this.moodDisplay()}
+        </View>
         <View style={styles.inputContainer}>
           <TouchableOpacity style={styles.images} onPress={() => this.saveMood(0)}>
             <Image style={styles.images} source={require('./images/0.png')} />
@@ -77,9 +104,9 @@ class App extends Component {
           <TouchableOpacity style={styles.images} onPress={() => this.saveMood(3)}>
             <Image style={styles.images} source={require('./images/3.png')} />
           </TouchableOpacity>
-        </View>
-        <View>
-          {this.moodDisplay()}
+          <TouchableOpacity style={styles.images} onPress={() => this.saveMood(4)}>
+            <Image style={styles.images} source={require('./images/4.png')} />
+          </TouchableOpacity>
         </View>
       </View>
     );
@@ -93,7 +120,9 @@ const styles = StyleSheet.create({
   inputContainer: {
     flexDirection: 'row',
     width: '100%',
-    justifyContent: 'center'
+    justifyContent: 'center',
+    position: 'absolute',
+    bottom: 10
   },
 
   images: {
@@ -119,6 +148,7 @@ const styles = StyleSheet.create({
   }
 });
 
+//mapping add,remove actions 
 const mapStateToProps = state => {
   return {
     moods: state.moods.moods
@@ -127,10 +157,10 @@ const mapStateToProps = state => {
 
 const mapDispatchToProps = dispatch => {
   return {
-    add: (name) => {
+    addMood: (name) => {
       dispatch(addMood(name))
     },
-    remove: (key) => {
+    removeMood: (key) => {
       dispatch(removeMood(key))
     }
   }

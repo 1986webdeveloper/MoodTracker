@@ -5,13 +5,14 @@ const initialState = {
   moods: []
 };
 
+//reducer for mood actions(add,remove mood)
 const moodReducer = (state = initialState, action) => {
   switch (action.type) {
     case ADD_MOOD:
       return {
         ...state,
         moods: state.moods.concat({
-          key: Math.random(),
+          key: 'mood_'+action.payload+'_'+Date.now(),
           value: action.payload,
           date: Date.now()
         })
@@ -19,7 +20,7 @@ const moodReducer = (state = initialState, action) => {
     case REMOVE_MOOD:
       return {
         ...state,
-        moods: [...state.moods.splice(0, action.payload), ...state.moods.splice(1)]
+        moods: state.moods.filter(item=> item.key !== action.payload)
       };
     default:
       return state;
